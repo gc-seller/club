@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gift Card Store</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Poppins", sans-serif;
+    }
+
+    body {
+      background-color: #f8f9fc;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* HEADER */
+    header {
+      position: sticky;
+      top: 0;
+      background: linear-gradient(90deg, #6a11cb, #2575fc);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 25px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+      z-index: 10;
+    }
+
+    .menu-btn, .cart-btn, .search-icon {
+      font-size: 24px;
+      cursor: pointer;
+      background: none;
+      border: none;
+      color: #fff;
+    }
+
+    .logo {
+      font-size: 24px;
+      font-weight: 600;
+      letter-spacing: 1px;
+    }
+
+    .search-bar {
+      flex: 1;
+      margin: 0 20px;
+    }
+
+    .search-bar input {
+      width: 100%;
+      padding: 8px 14px;
+      border-radius: 25px;
+      border: none;
+      outline: none;
+      font-size: 15px;
+    }
+
+    /* SIDEBAR */
+    .sidebar {
+      position: fixed;
+      left: -260px;
+      top: 0;
+      width: 250px;
+      height: 100%;
+      background: #fff;
+      box-shadow: 3px 0 10px rgba(0,0,0,0.1);
+      padding: 25px 20px;
+      transition: 0.4s;
+      z-index: 20;
+    }
+
+    .sidebar.active {
+      left: 0;
+    }
+
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.4);
+      backdrop-filter: blur(3px);
+      display: none;
+      z-index: 15;
+    }
+
+    .overlay.active {
+      display: block;
+    }
+
+    .sidebar h3 {
+      color: #333;
+      margin-bottom: 20px;
+      border-bottom: 2px solid #2575fc;
+      padding-bottom: 10px;
+    }
+
+    .sidebar a {
+      display: block;
+      text-decoration: none;
+      color: #333;
+      padding: 10px 0;
+      border-bottom: 1px solid #eee;
+      transition: 0.2s;
+    }
+
+    .sidebar a:hover {
+      color: #2575fc;
+      padding-left: 5px;
+    }
+
+    /* CARDS GRID */
+    .cards-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 25px;
+      padding: 40px 25px;
+      max-width: 1200px;
+      margin: auto;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+      text-align: center;
+      transition: 0.3s;
+    }
+
+    .card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+    }
+
+    .card img {
+      width: 100%;
+      height: 160px;
+      object-fit: cover;
+    }
+
+    .card h4 {
+      padding: 15px;
+      font-size: 18px;
+      color: #333;
+    }
+
+    /* MOBILE VIEW */
+    .search-icon {
+      display: none;
+    }
+
+    @media (max-width: 768px) {
+      .search-bar {
+        display: none;
+      }
+      .search-icon {
+        display: inline;
+      }
+    }
+
+    footer {
+      text-align: center;
+      padding: 15px;
+      background: #fff;
+      color: #888;
+      margin-top: 30px;
+      box-shadow: 0 -1px 5px rgba(0,0,0,0.1);
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <button class="menu-btn">☰</button>
+    <div class="logo">GiftStore</div>
+    <div class="search-bar">
+      <input type="text" placeholder="Search for gift cards...">
+    </div>
+    <button class="search-icon">🔍</button>
+    <button class="cart-btn">🛒</button>
+  </header>
+
+  <div class="sidebar" id="sidebar">
+    <h3>Menu</h3>
+    <a href="#">Home</a>
+    <a href="#">Amazon Gift Cards</a>
+    <a href="#">Play Store Gift Cards</a>
+    <a href="#">Flipkart Gift Cards</a>
+    <a href="#">Contact</a>
+  </div>
+
+  <div class="overlay" id="overlay"></div>
+
+  <main class="cards-container">
+    <!-- Row 1 -->
+    <div class="card">
+      <img src="https://m.media-amazon.com/images/I/61UuP3dTtTL._SX679_.jpg" alt="Amazon Card">
+      <h4>Amazon Gift Card</h4>
+    </div>
+    <div class="card">
+      <img src="https://play-lh.googleusercontent.com/0Ur4PgSxT9nVQHEFGGvQp2Sc1duGzQ-KLC5PjFsfDCV5Sx3jWQgrcRbtK5WzjWcfYw=w480-h960-rw" alt="Play Store Card">
+      <h4>Play Store Gift Card</h4>
+    </div>
+    <div class="card">
+      <img src="https://rukminim2.flixcart.com/image/850/1000/xif0q/gift-card/4/x/h/flipkart-gift-card-original-imah2j53ckhk9vrz.jpeg?q=90&crop=false" alt="Flipkart Card">
+      <h4>Flipkart Gift Card</h4>
+    </div>
+    <div class="card">
+      <img src="https://m.media-amazon.com/images/I/61UuP3dTtTL._SX679_.jpg" alt="Amazon Card">
+      <h4>Amazon E-Gift Card</h4>
+    </div>
+    <!-- Row 2 -->
+    <div class="card">
+      <img src="https://play-lh.googleusercontent.com/0Ur4PgSxT9nVQHEFGGvQp2Sc1duGzQ-KLC5PjFsfDCV5Sx3jWQgrcRbtK5WzjWcfYw=w480-h960-rw" alt="Play Card">
+      <h4>Play Store Recharge Card</h4>
+    </div>
+    <div class="card">
+      <img src="https://rukminim2.flixcart.com/image/850/1000/xif0q/gift-card/4/x/h/flipkart-gift-card-original-imah2j53ckhk9vrz.jpeg?q=90&crop=false" alt="Flipkart Card">
+      <h4>Flipkart E-Gift Card</h4>
+    </div>
+  </main>
+
+  <footer>
+    © 2025 GiftStore | All Rights Reserved
+  </footer>
+
+  <script>
+    const menuBtn = document.querySelector('.menu-btn');
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('overlay');
+
+    menuBtn.addEventListener('click', () => {
+      sidebar.classList.toggle('active');
+      overlay.classList.toggle('active');
+    });
+
+    overlay.addEventListener('click', () => {
+      sidebar.classList.remove('active');
+      overlay.classList.remove('active');
+    });
+  </script>
+
+</body>
+</html>

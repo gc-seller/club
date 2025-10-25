@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Gift Card Store</title>
+<style>
+  * {margin:0;padding:0;box-sizing:border-box;font-family:"Poppins",sans-serif;}
+
+  body {background-color:#f4f5f7;color:#333;min-height:100vh;overflow-x:hidden;}
+
+  /* HEADER */
+  header {position:sticky;top:0;background:#007BFF;color:#fff;display:flex;align-items:center;justify-content:space-between;padding:12px 25px;border-bottom:1px solid #006ae1;z-index:10;}
+  .menu-btn,.cart-btn,.search-icon {font-size:22px;cursor:pointer;background:none;border:none;color:#fff;}
+  .logo {font-size:22px;font-weight:600;}
+  .search-bar {flex:1;margin:0 20px;}
+  .search-bar input {width:100%;padding:8px 14px;border-radius:25px;border:1px solid #ccc;outline:none;font-size:15px;}
+  .search-icon{display:none;}
+  @media(max-width:768px){.search-bar{display:none;}.search-icon{display:inline;}}
+  
+  /* SIDEBAR */
+  .sidebar {position:fixed;left:-260px;top:0;width:250px;height:100%;background:#fff;border-right:1px solid #ddd;padding:25px 20px;transition:0.3s;z-index:20;}
+  .sidebar.active{left:0;}
+  .overlay {position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);display:none;z-index:15;}
+  .overlay.active{display:block;}
+  .sidebar h3{color:#007BFF;margin-bottom:15px;font-weight:600;}
+  .sidebar a{display:block;text-decoration:none;color:#333;padding:10px 0;border-bottom:1px solid #eee;transition:0.2s;}
+  .sidebar a:hover{color:#007BFF;}
+
+  /* CARDS */
+  .cards-container {display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:25px;padding:40px 25px;max-width:1200px;margin:auto;}
+  .card {background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 3px 8px rgba(0,0,0,0.05);text-align:center;border:1px solid #eee;transition:0.3s;cursor:pointer;}
+  .card:hover {transform:translateY(-5px);border-color:#007BFF;box-shadow:0 5px 15px rgba(0,0,0,0.1);}
+  .card img {width:100%;height:160px;object-fit:cover;border-bottom:1px solid #eee;}
+  .card h4 {padding:15px;font-size:17px;color:#333;font-weight:500;}
+
+  /* POPUPS */
+  .popup-backdrop {position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);display:none;z-index:25;}
+  .popup-backdrop.active{display:block;}
+  .cat-prod-popup {position:fixed;bottom:-100%;left:0;width:100%;background:#fff;border-radius:20px 20px 0 0;box-shadow:0 -3px 10px rgba(0,0,0,0.15);transition:bottom 0.4s ease;z-index:30;max-height:85vh;overflow-y:auto;}
+  .cat-prod-popup.active{bottom:0;}
+  .cat-prod-popup-container{padding:25px;}
+  .cat-prod-close{float:right;font-size:22px;cursor:pointer;color:#333;}
+  .popup-title{font-size:20px;font-weight:600;margin-bottom:15px;color:#007BFF;}
+  .swatches{display:flex;flex-wrap:wrap;gap:10px;margin:15px 0;}
+  .price-btn{border:2px solid #ccc;background:#fff;padding:8px 16px;border-radius:6px;cursor:pointer;transition:0.2s;font-weight:500;}
+  .price-btn.active{border-color:#007BFF;color:#007BFF;}
+  .price-btn.out{border-color:#ccc;color:#aaa;background:#f5f5f5;cursor:not-allowed;}
+
+  .voucher-details{display:flex;align-items:center;justify-content:space-between;gap:15px;}
+  .voucher-text h3{font-size:17px;margin-bottom:8px;color:#333;}
+  .voucher-text p{color:#666;font-size:14px;}
+  .voucher-img img{width:90px;height:60px;object-fit:contain;}
+  .voucher-price{margin-top:15px;font-weight:600;color:#007BFF;font-size:16px;}
+  .popup-footer{display:flex;justify-content:space-between;margin-top:25px;}
+  .popup-btn{padding:10px 20px;border-radius:6px;border:none;cursor:pointer;font-weight:500;}
+  .popup-btn.primary{background:#007BFF;color:#fff;}
+  .popup-btn.secondary{background:#f0f0f0;color:#333;}
+
+  /* Payment Page */
+  .payment-page,.thankyou-page {display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:#fff;z-index:40;padding:30px;overflow-y:auto;}
+  .payment-page.active,.thankyou-page.active{display:block;}
+  .payment-container {max-width:400px;margin:auto;background:#fff;border-radius:10px;padding:25px;box-shadow:0 2px 8px rgba(0,0,0,0.1);}
+  .payment-container h2{color:#007BFF;margin-bottom:20px;text-align:center;}
+  .payment-container input{width:100%;padding:10px;margin:8px 0;border:1px solid #ccc;border-radius:6px;}
+  .qr-code{display:block;margin:20px auto;width:160px;height:160px;}
+  .note{font-size:14px;color:#555;margin-top:10px;}
+  .submit-btn{width:100%;background:#007BFF;color:#fff;border:none;padding:10px;border-radius:6px;font-size:16px;margin-top:15px;cursor:pointer;}
+  .thankyou-container{text-align:center;margin-top:80px;}
+  .order-id{margin:15px 0;font-weight:600;color:#007BFF;}
+  .continue-btn{background:#007BFF;color:#fff;border:none;padding:10px 20px;border-radius:6px;cursor:pointer;margin-top:20px;}
+#whatsappBtn {
+  position: fixed;
+  bottom: 25px;
+  right: 25px;
+  width: 60px;
+  height: 60px;
+  background: #25D366;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  z-index: 100;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+#whatsappBtn:hover {
+  transform: scale(1.1);
+}
+#whatsappBtn img {
+  width: 35px;
+  height: 35px;
+}
+
+</style>
+</head>
+<body>
+
+<header>
+  <button class="menu-btn">☰</button>
+  <div class="logo">GiftStore</div>
+  <div class="search-bar"><input type="text" placeholder="Search for gift cards..."></div>
+  <button class="search-icon">🔍</button>
+  <button class="cart-btn">🛒</button>
+</header>
+
+<div class="sidebar" id="sidebar">
+  <h3>Menu</h3>
+  <a href="#">Home</a>
+  
+  <a href="https://wa.me/9732797358">Contact</a>
+</div>
+
+<div class="overlay" id="overlay"></div>
+
+<main class="cards-container">
+  <div class="card" data-name="Amazon Pay Gift Card" data-img="https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg">
+    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTYclS7pPZRMTtoq7kBRLMn_t7xnWvjs9l_FA&s" alt="Amazon Card">
+    <h4>Amazon Gift Card</h4>
+  </div>
+  <div class="card" data-name="Play Store Gift Card" data-img="https://upload.wikimedia.org/wikipedia/commons/d/d0/Google_Play_Arrow_logo.svg">
+    <img src="https://rukminim2.flixcart.com/image/480/640/xif0q/e-gift-voucher/5/l/4/open-anyone-google-play-2000-original-imagzmawxf4mzzyh.jpeg?q=20" alt="Play Store Card">
+    <h4>Play Store Gift Card</h4>
+  </div>
+  <div class="card" data-name="Flipkart Gift Card" data-img="https://www.freelogovectors.net/wp-content/uploads/2025/07/flipkart-logo-icon-freelogovectors.net_.png">
+    <img src="https://5.imimg.com/data5/SELLER/Default/2024/12/477354442/KP/YA/NK/79379188/flipkart-gift-voucher.jpg" alt="Flipkart Card">
+    <h4>Flipkart Gift Card</h4>
+  </div>
+  <div class="card" data-name="Xbox Gift Card" data-img="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTVeFTUCV5p-B_88gYXVw7qgMI9MXU7tpjDng&usqp=CAU">
+    <img src="https://api.asdagiftcards.com/storage/images/cards/designs/yfA1XHpmlSzKU0GBgHggpASk8RoaMPg6mNH66sdX.jpg" alt="Xbox Card">
+    <h4>Xbox Gift Card</h4>
+  </div>
+</main>
+
+<!-- Popup -->
+<div class="popup-backdrop" id="popupBackdrop"></div>
+<div class="cat-prod-popup" id="popup">
+  <div class="cat-prod-popup-container">
+    <span class="cat-prod-close" id="closePopup">✕</span>
+    <h2 class="popup-title" id="popupTitle">Gift Card</h2>
+    <p><b>Choose voucher value:</b></p>
+    <div class="swatches" id="priceOptions"></div>
+    <hr>
+    <div class="voucher-details">
+      <div class="voucher-text"><h3 id="voucherName"></h3><p>Redeem easily and enjoy your rewards instantly.</p></div>
+      <div class="voucher-img"><img id="voucherImage" src="" alt="Voucher Image"></div>
+    </div>
+    <div class="voucher-price" id="voucherPrice"></div>
+    <div class="popup-footer">
+      <button class="popup-btn secondary" id="cancelPopup">Cancel</button>
+      <button class="popup-btn primary" id="buyNowBtn">Buy Now</button>
+    </div>
+  </div>
+</div>
+<!-- WhatsApp Support Button -->
+<a style="z-index: 20;" href="https://wa.me/9732797358" target="_blank" id="whatsappBtn">
+  <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp" />
+</a>
+
+
+<!-- Payment Page -->
+<div class="payment-page" id="paymentPage">
+  <div class="payment-container">
+    <h2>Complete Your Payment</h2>
+    <img class="qr-code"src="{{ url_for('static', filename='qr2.jpeg') }}" alt="QR Code">
+    <!-- Price payable dynamically inserted here -->
+    <input type="text" id="fname" placeholder="First Name" required>
+    <input type="text" id="lname" placeholder="Last Name" required>
+    <input type="email" id="email" placeholder="Email Address" required>
+    <p class="note">Redeem code will be sent to this email after successful payment.</p>
+    <input type="text" id="txnId" placeholder="Transaction ID" required>
+    <button class="submit-btn" id="submitPayment">Submit Payment</button>
+  </div>
+</div>
+
+<!-- Thank You Page -->
+<div class="thankyou-page" id="thankyouPage">
+  <div class="thankyou-container">
+    <h2>🎉 Thank You for Your Purchase!</h2>
+    <p class="order-id" id="orderId"></p>
+    <p>Please wait for confirmation. Your redeem code will arrive shortly via email.</p>
+    <button class="continue-btn" id="continueShopping">Continue Shopping</button>
+  </div>
+</div>
+
+<footer>© 2025 GiftStore | All Rights Reserved</footer>
+
+<script>
+const menuBtn=document.querySelector('.menu-btn');
+const sidebar=document.getElementById('sidebar');
+const overlay=document.getElementById('overlay');
+const cards=document.querySelectorAll('.card');
+const popup=document.getElementById('popup');
+const popupBackdrop=document.getElementById('popupBackdrop');
+const closePopup=document.getElementById('closePopup');
+const cancelPopup=document.getElementById('cancelPopup');
+const popupTitle=document.getElementById('popupTitle');
+const priceOptions=document.getElementById('priceOptions');
+const voucherName=document.getElementById('voucherName');
+const voucherImage=document.getElementById('voucherImage');
+const voucherPrice=document.getElementById('voucherPrice');
+const buyNowBtn=document.getElementById('buyNowBtn');
+const paymentPage=document.getElementById('paymentPage');
+const thankyouPage=document.getElementById('thankyouPage');
+const submitPayment=document.getElementById('submitPayment');
+const orderId=document.getElementById('orderId');
+const continueShopping=document.getElementById('continueShopping');
+
+const valueToPrice={1000:200,5000:1000,10000:1850,20000:3300,30000:5000,50000:7500,100000:12000};
+const outOfStock={
+  "Amazon Pay Gift Card":[30000,50000,100000],
+  "Play Store Gift Card":[50000,100000],
+  "Flipkart Gift Card":[50000,100000],
+  "Xbox Gift Card":[]
+};
+
+menuBtn.addEventListener('click',()=>{sidebar.classList.toggle('active');overlay.classList.toggle('active');});
+overlay.addEventListener('click',()=>{sidebar.classList.remove('active');overlay.classList.remove('active');});
+
+let selectedValue=null,selectedName=null;
+
+cards.forEach(card=>{
+  card.addEventListener('click',()=>{
+    const name=card.getAttribute('data-name');
+    const imgSrc=card.getAttribute('data-img');
+    popupTitle.textContent=name;
+    voucherImage.src=imgSrc;
+    selectedName=name;
+    priceOptions.innerHTML='';
+    Object.keys(valueToPrice).forEach(val=>{
+      if(name==="Play Store Gift Card"&&val>30000)return;
+      const btn=document.createElement('button');
+      btn.classList.add('price-btn');
+      btn.textContent=`₹${val}`;
+      if(outOfStock[name].includes(parseInt(val))){
+        btn.classList.add('out');
+        btn.textContent+=' (Out of stock)';
+      }else{
+        btn.addEventListener('click',()=>{
+          document.querySelectorAll('.price-btn').forEach(b=>b.classList.remove('active'));
+          btn.classList.add('active');
+          selectedValue=val;
+          const price=valueToPrice[val];
+          voucherName.textContent=`${name} Rs.${val}`;
+          voucherPrice.textContent=`Price: ₹${price}`;
+        });
+      }
+      priceOptions.appendChild(btn);
+    });
+    voucherName.textContent=name;
+    voucherPrice.textContent="Price: -";
+    popup.classList.add('active');
+    popupBackdrop.classList.add('active');
+  });
+});
+
+[closePopup,cancelPopup,popupBackdrop].forEach(el=>{el.addEventListener('click',()=>{popup.classList.remove('active');popupBackdrop.classList.remove('active');});});
+
+buyNowBtn.addEventListener('click',()=>{
+    if(!selectedValue){alert("Please select a voucher value first!");return;}
+    popup.classList.remove('active');
+    popupBackdrop.classList.remove('active');
+
+    // Show price on payment page
+    const priceToPay=valueToPrice[selectedValue];
+    const qr=document.querySelector('.qr-code');
+    
+    // Remove old price if exists
+    let oldPrice=document.getElementById('priceToPay');
+    if(oldPrice) oldPrice.remove();
+
+    const priceElem=document.createElement('p');
+    priceElem.id="priceToPay";
+    priceElem.style.textAlign="center";
+    priceElem.style.fontWeight="600";
+    priceElem.style.color="#007BFF";
+    priceElem.style.margin="10px 0";
+    priceElem.textContent=`Price to Pay: ₹${priceToPay}`;
+    const paymentContainer=document.querySelector('.payment-container');
+    paymentContainer.insertBefore(priceElem, document.getElementById('fname'));
+
+    paymentPage.classList.add('active');
+});
+
+submitPayment.addEventListener('click',()=>{
+    const txnId=document.getElementById('txnId').value.trim();
+    const email=document.getElementById('email').value.trim();
+    if(!txnId||!email){alert("Please fill all fields and enter transaction ID!");return;}
+    paymentPage.classList.remove('active');
+    thankyouPage.classList.add('active');
+    const randomOrder="ORD"+Math.floor(Math.random()*1000000);
+    orderId.textContent="Order ID: "+randomOrder;
+});
+
+continueShopping.addEventListener('click',()=>{thankyouPage.classList.remove('active');});
+</script>
+
+</body>
+</html>
